@@ -196,10 +196,10 @@ contract NFT is ERC721Enumerable, Ownable {
     );
     string memory output = string(abi.encodePacked(Strings.toString(tokenId),"_"));
     CCNFTMetadata memory tempMeta = CCNFTMetadatas[tokenId];
-    uint256[] memory nextLayerParentBuffer = new uint256[](6);
-    uint256[] memory nextLayerBuffer = new uint256[](6);
-    uint256[6] memory layerParentBuffer = [tokenId, tokenId, 0, 0, 0, 0];
-    uint256[6] memory layerBuffer = [tempMeta.fatherTokenID, tempMeta.motherTokenID, 0, 0, 0, 0];
+    uint256[6] memory nextLayerParentBuffer = [tokenId, tokenId, 0, 0, 0, 0];
+    uint256[6] memory nextLayerBuffer = [tempMeta.fatherTokenID, tempMeta.motherTokenID, 0, 0, 0, 0];
+    uint256[] memory layerParentBuffer = new uint256[](6);
+    uint256[] memory layerBuffer = new uint256[](6);
     bool end = false;
     while (!end){
       for (uint256 i=0; i<6; i++){
