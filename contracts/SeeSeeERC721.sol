@@ -46,11 +46,8 @@ contract NFT is ERC721Enumerable, Ownable {
     if (msg.sender != owner()) {
       require(msg.value >= cost, "You should deposit enough value to mint.");
     }
-
     uint256 newId = totalSupply() + 1;
     _safeMint(msg.sender, newId);
-    require(_exists(newId), "Minting Failed for Unknown Reason");
-    
     CCNFTMetadatas[newId] = CCNFTMetadata(_coverMediaUri,_name,_gender,_inscription,_fatherTokenID,_motherTokenID,_memoryCollectionUri);
     coverMediaChangeableMap[newId] = true;
     memoryCollectionChangeableMap[newId] = true;
@@ -190,23 +187,27 @@ contract NFT is ERC721Enumerable, Ownable {
       _msgSender() == nftOwner || isApprovedForAll(nftOwner, _msgSender()),
       "ERC721: approve caller is not token owner or approved for all"
     );
-    string memory output = string(abi.encodePacked(Strings.toString(tokenId),"_"));
+    string memory output = "";
     CCNFTMetadata memory tempMeta = CCNFTMetadatas[tokenId];
-    uint256[] memory nextLayerParentBuffer = new uint256[](6);
-    uint256[] memory nextLayerBuffer = new uint256[](6);
-    uint256[] memory layerParentBuffer = new uint256[](6);
-    uint256[] memory layerBuffer = new uint256[](6);
+    uint256[] memory nextLayerParentBuffer = new uint256[](4);
+    uint256[] memory nextLayerBuffer = new uint256[](4);
+    for (uint256 i=0; i<4; i++){
+      nextLayerParentBuffer[i] = 0;
+      nextLayerBuffer[i] = 0;
+    }
     nextLayerBuffer[0] = tokenId;
+    uint256[] memory layerParentBuffer = new uint256[](4);
+    uint256[] memory layerBuffer = new uint256[](4);
     bool end = false;
     while (!end){
-      for (uint256 i=0; i<6; i++){
+      for (uint256 i=0; i<4; i++){
         layerParentBuffer[i] = nextLayerParentBuffer[i];
         layerBuffer[i] = nextLayerBuffer[i];
         nextLayerParentBuffer[i] = 0;
         nextLayerBuffer[i] = 0;
       }
       uint256 nextLayerPointer = 0;
-      for (uint256 i=0; i<6; i++){
+      for (uint256 i=0; i<4; i++){
         uint256 lastId = layerParentBuffer[i];
         uint256 nowId = layerBuffer[i];
         if(nowId==0){
