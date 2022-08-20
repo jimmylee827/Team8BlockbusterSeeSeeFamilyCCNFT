@@ -172,10 +172,6 @@ contract NFT is ERC721Enumerable, Ownable {
     CCNFTMetadatas[tokenId].memoryCollectionUri = _memoryCollectionUri;
     memoryCollectionChangeableMap[tokenId] = false;
   }
-
-  function setCost(uint256 _newCost) public onlyOwner {
-    cost = _newCost;
-  }
  
   function withdraw() public payable onlyOwner {
     (bool os, ) = payable(owner()).call{value: address(this).balance}("");
@@ -196,10 +192,11 @@ contract NFT is ERC721Enumerable, Ownable {
     );
     string memory output = string(abi.encodePacked(Strings.toString(tokenId),"_"));
     CCNFTMetadata memory tempMeta = CCNFTMetadatas[tokenId];
-    uint256[6] memory nextLayerParentBuffer = [tokenId, tokenId, 0, 0, 0, 0];
-    uint256[6] memory nextLayerBuffer = [tempMeta.fatherTokenID, tempMeta.motherTokenID, 0, 0, 0, 0];
+    uint256[] memory nextLayerParentBuffer = new uint256[](6);
+    uint256[] memory nextLayerBuffer = new uint256[](6);
     uint256[] memory layerParentBuffer = new uint256[](6);
     uint256[] memory layerBuffer = new uint256[](6);
+    nextLayerBuffer[0] = tokenId;
     bool end = false;
     while (!end){
       for (uint256 i=0; i<6; i++){
@@ -218,19 +215,17 @@ contract NFT is ERC721Enumerable, Ownable {
           }
           break;
         }
-        else{
-          output = string(abi.encodePacked(output,Strings.toString(lastId),"-",Strings.toString(nowId),"|"));
-          tempMeta = CCNFTMetadatas[nowId];
-          if(tempMeta.fatherTokenID>0){
-            nextLayerParentBuffer[nextLayerPointer] = nowId;
-            nextLayerBuffer[nextLayerPointer] = tempMeta.fatherTokenID;
-            nextLayerPointer += 1;
-          }
-          if(tempMeta.motherTokenID>0){
-            nextLayerParentBuffer[nextLayerPointer] = nowId;
-            nextLayerBuffer[nextLayerPointer] = tempMeta.motherTokenID;
-            nextLayerPointer += 1;
-          }
+        output = string(abi.encodePacked(output,lastId==0?Strings.toString(nowId):Strings.toString(lastId),"-",Strings.toString(nowId),"|"));
+        tempMeta = CCNFTMetadatas[nowId];
+        if(tempMeta.fatherTokenID>0){
+          nextLayerParentBuffer[nextLayerPointer] = nowId;
+          nextLayerBuffer[nextLayerPointer] = tempMeta.fatherTokenID;
+          nextLayerPointer += 1;
+        }
+        if(tempMeta.motherTokenID>0){
+          nextLayerParentBuffer[nextLayerPointer] = nowId;
+          nextLayerBuffer[nextLayerPointer] = tempMeta.motherTokenID;
+          nextLayerPointer += 1;
         }
       }
       output = string(abi.encodePacked(output,"_"));
