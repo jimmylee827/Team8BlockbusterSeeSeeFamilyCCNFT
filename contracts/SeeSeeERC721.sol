@@ -216,7 +216,11 @@ contract NFT is ERC721Enumerable, Ownable {
           }
           break;
         }
-        output = string(abi.encodePacked(output,lastId==0?Strings.toString(nowId):Strings.toString(lastId),"-",Strings.toString(nowId),"|"));
+        string memory newNode = Strings.toString(nowId);
+        if(lastId>0){
+          newNode = string(abi.encodePacked(Strings.toString(lastId),"-",Strings.toString(nowId)));
+        }
+        output = string(abi.encodePacked(output,newNode,"|"));
         tempMeta = CCNFTMetadatas[nowId];
         if(tempMeta.fatherTokenID>0){
           nextLayerParentBuffer[nextLayerPointer] = nowId;
